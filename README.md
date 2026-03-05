@@ -33,6 +33,33 @@ Add the package reference in your service project and keep your host configurati
 </ItemGroup>
 ```
 
+### Classic Program (`CreateHostBuilder`)
+
+```csharp
+public static IHostBuilder CreateHostBuilder(string[] args) =>
+    Host.CreateDefaultBuilder(args)
+        .UseSystemd()
+        .ConfigureWebHostDefaults(webBuilder =>
+        {
+            webBuilder.UseStartup<Startup>();
+        });
+```
+
+### Top-level statements
+
+```csharp
+using Microsoft.Extensions.Hosting;
+
+var builder = WebApplication.CreateBuilder(args);
+
+builder.Host.UseSystemd();
+builder.Services.AddControllers();
+
+var app = builder.Build();
+app.MapControllers();
+app.Run();
+```
+
 ## 🤝 Contributing
 Issues and pull requests are welcome! See the contribution guidelines (coming soon).
 
