@@ -1,0 +1,17 @@
+[Unit]
+Description=miapp-core ASP.NET Core Service
+After=network.target
+
+[Service]
+Type=notify
+NotifyAccess=main
+WorkingDirectory=/opt/myapp
+ExecStart=/usr/bin/dotnet /opt/myapp/miapp-core.dll
+Restart=on-failure
+RestartSec=2
+KillSignal=SIGINT
+TimeoutStopSec=20
+Environment=ASPNETCORE_URLS=http://0.0.0.0:80
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="qckdev.Extensions.Hosting.Systemd/qckdev.Extensions.Hosting.Systemd.csproj" />
+  <Folder Name="/examples/">
+    <Project Path="miapp-core/miapp-core.csproj" Id="01f544ad-c5de-48be-aa5a-2823addba180" />
+  </Folder>
+  <Project Path="qckdev.Extensions.Hosting.Systemd.Test/qckdev.Extensions.Hosting.Systemd.Test.csproj" />
+</Solution>

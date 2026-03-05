@@ -1,0 +1,38 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+COPY ["miapp-core/miapp-core.csproj", "miapp-core/"]
+RUN dotnet restore "./miapp-core/miapp-core.csproj"
+COPY . .
+WORKDIR /src/miapp-core
+RUN dotnet publish "./miapp-core.csproj" -c Release -f net6.0 -o /out/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS final
+
+ENV container=docker
+ENV DOTNET_RUNNING_IN_CONTAINER=true
+ENV ASPNETCORE_URLS=http://0.0.0.0:80
+
+STOPSIGNAL SIGRTMIN+3
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends systemd systemd-sysv dbus \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /lib/systemd/system/multi-user.target.wants/* \
+    && rm -rf /etc/systemd/system/*.wants/* \
+    && rm -rf /lib/systemd/system/local-fs.target.wants/* \
+    && rm -rf /lib/systemd/system/sockets.target.wants/*udev* \
+    && rm -rf /lib/systemd/system/sockets.target.wants/*initctl* \
+    && rm -rf /lib/systemd/system/basic.target.wants/* \
+    && rm -rf /lib/systemd/system/anaconda.target.wants/*
+
+WORKDIR /opt/myapp
+COPY --from=build /out/publish/ /opt/myapp/
+COPY miapp-core/miapp-core.service /etc/systemd/system/miapp-core.service
+
+RUN ln -s /etc/systemd/system/miapp-core.service /etc/systemd/system/multi-user.target.wants/miapp-core.service
+
+EXPOSE 80
+VOLUME ["/sys/fs/cgroup"]
+
+CMD ["/sbin/init"]
